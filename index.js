@@ -1,6 +1,8 @@
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 4000
+const { MongoClient, ServerApiVersion,ObjectId } = require('mongodb');
+
 const jwt = require('jsonwebtoken');
 
 const cors = require('cors');
@@ -9,7 +11,6 @@ app.use(cors())
 app.use(express.json())
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ntqc6.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 // console.log(uri);
@@ -55,7 +56,21 @@ async function run() {
             const profile = await usersCollection.findOne({ email: email })
             res.send(profile)
         })
-        
+
+        //28 update img
+        app.put('/my-image/:id', verifyJWT, async (req, res) => {
+            const id = req.params.id
+            const updateInfo = req.body
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: updateInfo
+            };
+            const result = await usersCollection.updateOne(filter, updateDoc, options);
+            res.send(result)
+        })
+
+
     } 
     finally {
         // await client.close();
