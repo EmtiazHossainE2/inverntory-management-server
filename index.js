@@ -57,8 +57,21 @@ async function run() {
             res.send(profile)
         })
 
-        //28 update img
+        // update img
         app.put('/my-image/:id', verifyJWT, async (req, res) => {
+            const id = req.params.id
+            const updateInfo = req.body
+            const filter = { _id: ObjectId(id) }
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: updateInfo
+            };
+            const result = await usersCollection.updateOne(filter, updateDoc, options);
+            res.send(result)
+        })
+
+        //27 update profile
+        app.put('/profile/:id', verifyJWT, async (req, res) => {
             const id = req.params.id
             const updateInfo = req.body
             const filter = { _id: ObjectId(id) }
