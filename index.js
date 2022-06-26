@@ -35,6 +35,7 @@ async function run() {
     try {
         await client.connect();
         const usersCollection = client.db("inventoryManagement").collection("users");
+        const productsCollection = client.db("inventoryManagement").collection("products");
 
         //user create or update 
         app.put('/user/:email', async (req, res) => {
@@ -70,7 +71,7 @@ async function run() {
             res.send(result)
         })
 
-        //27 update profile
+        // update profile
         app.put('/profile/:id', verifyJWT, async (req, res) => {
             const id = req.params.id
             const updateInfo = req.body
@@ -80,6 +81,13 @@ async function run() {
                 $set: updateInfo
             };
             const result = await usersCollection.updateOne(filter, updateDoc, options);
+            res.send(result)
+        })
+
+        // add single product
+        app.post('/products/add', verifyJWT, async (req, res) => {
+            const product = req.body
+            const result = await productsCollection.insertOne(product)
             res.send(result)
         })
 
